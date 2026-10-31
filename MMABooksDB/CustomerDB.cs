@@ -19,7 +19,7 @@ using DBDbType = MySql.Data.MySqlClient.MySqlDbType;
 
 namespace MMABooksDB
 {
-    public class CustomerDB
+    public class CustomerDB : DBBase, IReadDB, IWriteDB
     {
         /*
         public IBaseProps Create(IBaseProps p)
@@ -61,5 +61,64 @@ namespace MMABooksDB
             }
         }
         */
+        public IBaseProps Create(IBaseProps props)
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool Delete(IBaseProps props)
+        {
+            throw new NotImplementedException();
+        }
+
+        public IBaseProps Retrieve(object key)
+        {
+            DBDataReader data = null;
+            CustomerProps props = new CustomerProps();
+            DBCommand command = new DBCommand();
+
+            command.CommandText = "usp_CustomerSelect";
+            command.CommandType = CommandType.StoredProcedure;
+            command.Parameters.Add("custID", DBDbType.Int32);
+            command.Parameters["custID"].Value = (int)key;
+
+            try
+            {
+                data = RunProcedure(command);
+                if (!data.IsClosed)
+                {
+                    if (data.Read())
+                    {
+                        props.SetState(data);
+                    }
+                    else
+                        throw new Exception("Record does not exist in the database.");
+                }
+                return props;
+            }
+            catch (Exception e)
+            {
+                // log this exception
+                throw;
+            }
+            finally
+            {
+                if (data != null)
+                {
+                    if (!data.IsClosed)
+                        data.Close();
+                }
+            }
+        }
+
+        public object RetrieveAll()
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool Update(IBaseProps props)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
