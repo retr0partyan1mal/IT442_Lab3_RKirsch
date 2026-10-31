@@ -32,11 +32,11 @@ namespace MMABooksDB
             command.CommandType = CommandType.StoredProcedure;
             command.Parameters.Add("custId", DBDbType.Int32);
             command.Parameters.Add("name_p", DBDbType.VarChar);
-            ... there are more parameters here
+            // ... there are more parameters here
             command.Parameters[0].Direction = ParameterDirection.Output;
             command.Parameters["name_p"].Value = props.Name;
-            ... and more values here
-
+            // ... and more values here
+            
             try
             {
                 rowsAffected = RunNonQueryProcedure(command);
@@ -60,6 +60,6 @@ namespace MMABooksDB
                     mConnection.Close();
             }
         }
-         */
+        */
     }
 }
