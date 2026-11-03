@@ -109,7 +109,7 @@ namespace MMABooksBusiness
             mdbWriteable = new StateDB();
         }
 
-        #region constructors
+        #region Constructors
         /// <summary>
         /// Default constructor - gets the connection string - assumes a new record that is not in the database.
         /// </summary>

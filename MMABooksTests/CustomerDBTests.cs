@@ -1,14 +1,12 @@
-using NUnit.Framework;
-
-using MMABooksProps;
+using MMABooksBusiness;
 using MMABooksDB;
-
-using DBCommand = MySql.Data.MySqlClient.MySqlCommand;
-using System.Data;
-
-using System.Collections.Generic;
-using System;
+using MMABooksProps;
 using MySql.Data.MySqlClient;
+using NUnit.Framework;
+using System;
+using System.Collections.Generic;
+using System.Data;
+using DBCommand = MySql.Data.MySqlClient.MySqlCommand;
 
 namespace MMABooksTests
 {
@@ -27,6 +25,29 @@ namespace MMABooksTests
         }
 
         [Test]
+        public void TestCreate()
+        {
+            CustomerProps p = new CustomerProps();
+            p.Name = "Shaggy Rogers";
+            p.Address = "210 Spooky Street";
+            p.City = "Coolsville";
+            p.State = "OH";
+            p.ZipCode = "1969";
+            db.Create(p);
+            CustomerProps p2 = (CustomerProps)db.Retrieve(p.CustomerID);
+            Assert.AreEqual(p.GetState(), p2.GetState());
+        }
+
+        [Test]
+        public void TestDelete()
+        {
+            List<CustomerProps> customers = (List<CustomerProps>)db.RetrieveAll();
+            CustomerProps p = customers.OrderByDescending(c => c.CustomerID).First();
+            Assert.IsTrue(db.Delete(p));
+            Assert.Throws<Exception>(() => db.Retrieve(p.CustomerID));
+        } 
+
+        [Test]
         public void TestRetrieve()
         {
             CustomerProps p = (CustomerProps)db.Retrieve(1); // Using "CustomerID" instead of 1 kept giving an error.
@@ -34,66 +55,22 @@ namespace MMABooksTests
             Assert.AreEqual("Molunguri, A", p.Name);
         }
 
-        /*[Test]
+        [Test]
         public void TestRetrieveAll()
         {
-            List<StateProps> list = (List<StateProps>)db.RetrieveAll();
-            Assert.AreEqual(53, list.Count);
-        }
-
-        [Test]
-        public void TestDelete()
-        {
-            StateProps p = (StateProps)db.Retrieve("HI");
-            Assert.True(db.Delete(p));
-            Assert.Throws<Exception>(() => db.Retrieve("HI"));
-        }
-
-
-        [Test]
-        public void TestDeleteForeignKeyConstraint()
-        {
-            StateProps p = (StateProps)db.Retrieve("OR");
-            Assert.Throws<MySqlException>(() => db.Delete(p));
+            List<CustomerProps> list = (List<CustomerProps>)db.RetrieveAll();
+            Assert.AreEqual(696, list.Count);
         }
 
         [Test]
         public void TestUpdate()
         {
-            StateProps p = (StateProps)db.Retrieve("OR");
-            p.Name = "Oregon";
+            List<CustomerProps> customers = (List<CustomerProps>)db.RetrieveAll();
+            CustomerProps p = customers[customers.Count - 1];
+            p.Name = "Shahgy Rogers";
             Assert.True(db.Update(p));
-            p = (StateProps)db.Retrieve("OR");
-            Assert.AreEqual("Oregon", p.Name);
+            p = (CustomerProps)db.Retrieve(p.CustomerID);
+            Assert.AreEqual("Shahgy Rogers", p.Name);
         }
-
-        [Test]
-        public void TestUpdateFieldTooLong()
-        {
-            StateProps p = (StateProps)db.Retrieve("OR");
-            p.Name = "Oregon is the state where Crater Lake National Park is.";
-            Assert.Throws<MySqlException>(() => db.Update(p));
-        }
-
-        [Test]
-        public void TestCreate()
-        {
-            StateProps p = new StateProps();
-            p.Code = "??";
-            p.Name = "Where am I";
-            db.Create(p);
-            StateProps p2 = (StateProps)db.Retrieve(p.Code);
-            Assert.AreEqual(p.GetState(), p2.GetState());
-        }
-
-        [Test]
-        public void TestCreatePrimaryKeyViolation()
-        {
-            StateProps p = new StateProps();
-            p.Code = "OR";
-            p.Name = "Oregon";
-            Assert.Throws<MySqlException>(() => db.Create(p));
-        }
-        */
     }
 }

@@ -21,7 +21,6 @@ namespace MMABooksDB
 {
     public class CustomerDB : DBBase, IReadDB, IWriteDB
     {
-        /*
         public IBaseProps Create(IBaseProps p)
         {
             int rowsAffected = 0;
@@ -31,12 +30,19 @@ namespace MMABooksDB
             command.CommandText = "usp_CustomerCreate";
             command.CommandType = CommandType.StoredProcedure;
             command.Parameters.Add("custId", DBDbType.Int32);
-            command.Parameters.Add("name_p", DBDbType.VarChar);
-            // ... there are more parameters here
+            command.Parameters.Add("Name_p", DBDbType.VarChar);
+            command.Parameters.Add("Address_p", DBDbType.VarChar);
+            command.Parameters.Add("City_p", DBDbType.VarChar);
+            command.Parameters.Add("State_p", DBDbType.VarChar);
+            command.Parameters.Add("ZipCode_p", DBDbType.VarChar);
+
             command.Parameters[0].Direction = ParameterDirection.Output;
-            command.Parameters["name_p"].Value = props.Name;
-            // ... and more values here
-            
+            command.Parameters["Name_p"].Value = props.Name;
+            command.Parameters["Address_p"].Value = props.Address;
+            command.Parameters["City_p"].Value = props.City;
+            command.Parameters["State_p"].Value = props.State;
+            command.Parameters["ZipCode_p"].Value = props.ZipCode;
+
             try
             {
                 rowsAffected = RunNonQueryProcedure(command);
@@ -60,15 +66,55 @@ namespace MMABooksDB
                     mConnection.Close();
             }
         }
-        */
-        public IBaseProps Create(IBaseProps props)
-        {
-            throw new NotImplementedException();
-        }
 
-        public bool Delete(IBaseProps props)
+        public bool Delete(IBaseProps p)
         {
-            throw new NotImplementedException();
+            CustomerProps props = (CustomerProps)p;
+            int rowsAffected = 0;
+
+            DBCommand command = new DBCommand();
+            command.CommandText = "usp_CustomerDelete";
+            command.CommandType = CommandType.StoredProcedure;
+            command.Parameters.Add("custId", DBDbType.Int32);
+            command.Parameters.Add("name", DBDbType.VarChar);
+            command.Parameters.Add("Address_p", DBDbType.VarChar);
+            command.Parameters.Add("City_p", DBDbType.VarChar);
+            command.Parameters.Add("State_p", DBDbType.VarChar);
+            command.Parameters.Add("ZipCode_p", DBDbType.VarChar);
+            command.Parameters.Add("conCurrId", DBDbType.Int32);
+
+            command.Parameters["custId"].Value = props.CustomerID;
+            command.Parameters["name"].Value = props.Name;
+            command.Parameters["Address_p"].Value = props.Address;
+            command.Parameters["City_p"].Value = props.City;
+            command.Parameters["State_p"].Value = props.State;
+            command.Parameters["ZipCode_p"].Value = props.ZipCode;
+            command.Parameters["conCurrId"].Value = props.ConcurrencyID;
+
+            try
+            {
+                rowsAffected = RunNonQueryProcedure(command);
+                if (rowsAffected == 1)
+                {
+                    return true;
+                }
+                else
+                {
+                    string message = "Record cannot be deleted. It has been edited by another user.";
+                    throw new Exception(message);
+                }
+
+            }
+            catch (Exception e)
+            {
+                // log this exception
+                throw;
+            }
+            finally
+            {
+                if (mConnection.State == ConnectionState.Open)
+                    mConnection.Close();
+            }
         }
 
         public IBaseProps Retrieve(object key)
@@ -113,12 +159,86 @@ namespace MMABooksDB
 
         public object RetrieveAll()
         {
-            throw new NotImplementedException();
+            List<CustomerProps> list = new List<CustomerProps>();
+            DBDataReader reader = null;
+            CustomerProps props;
+
+            try
+            {
+                reader = RunProcedure("usp_CustomerSelectAll");
+                if (!reader.IsClosed)
+                {
+                    while (reader.Read())
+                    {
+                        props = new CustomerProps();
+                        props.SetState(reader);
+                        list.Add(props);
+                    }
+                }
+                return list;
+            }
+            catch (Exception e)
+            {
+                // log this exception
+                throw;
+            }
+            finally
+            {
+                if (!reader.IsClosed)
+                {
+                    reader.Close();
+                }
+            }
         }
 
-        public bool Update(IBaseProps props)
+        public bool Update(IBaseProps p)
         {
-            throw new NotImplementedException();
+            int rowsAffected = 0;
+            CustomerProps props = (CustomerProps)p;
+
+            DBCommand command = new DBCommand();
+            command.CommandText = "usp_CustomerUpdate";
+            command.CommandType = CommandType.StoredProcedure;
+            command.Parameters.Add("custId", DBDbType.Int32);
+            command.Parameters.Add("name", DBDbType.VarChar);
+            command.Parameters.Add("Address_p", DBDbType.VarChar);
+            command.Parameters.Add("City_p", DBDbType.VarChar);
+            command.Parameters.Add("State_p", DBDbType.VarChar);
+            command.Parameters.Add("ZipCode_p", DBDbType.VarChar);
+            command.Parameters.Add("conCurrId", DBDbType.Int32);
+
+            command.Parameters["custId"].Value = props.CustomerID;
+            command.Parameters["name"].Value = props.Name;
+            command.Parameters["Address_p"].Value = props.Address;
+            command.Parameters["City_p"].Value = props.City;
+            command.Parameters["State_p"].Value = props.State;
+            command.Parameters["ZipCode_p"].Value = props.ZipCode;
+            command.Parameters["conCurrId"].Value = props.ConcurrencyID;
+
+            try
+            {
+                rowsAffected = RunNonQueryProcedure(command);
+                if (rowsAffected == 1)
+                {
+                    props.ConcurrencyID++;
+                    return true;
+                }
+                else
+                {
+                    string message = "Record cannot be updated. It has been edited by another user.";
+                    throw new Exception(message);
+                }
+            }
+            catch (Exception e)
+            {
+                // log this exception
+                throw;
+            }
+            finally
+            {
+                if (mConnection.State == ConnectionState.Open)
+                    mConnection.Close();
+            }
         }
     }
 }
