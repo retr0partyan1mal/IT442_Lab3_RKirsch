@@ -7,6 +7,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Include="C:\Users\piggi\Documents\Starter Pack\framework_lab3_2023_Starterfiles\framework_lab3_2023_Starterfiles\Lab3ClassDiagram.cd" Link="Lab3ClassDiagram.cd" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.11.0" />
     <PackageReference Include="NUnit" Version="5.0.0" />
     <PackageReference Include="NUnit3TestAdapter" Version="6.3.1" />
