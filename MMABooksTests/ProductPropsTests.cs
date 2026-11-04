@@ -9,6 +9,7 @@ namespace MMABooksTests
     public class ProductPropsTests
     {
         ProductProps props;
+
         [SetUp]
         public void Setup()
         {

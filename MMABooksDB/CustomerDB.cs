@@ -1,14 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Linq;
 
 using MMABooksTools;
 using MMABooksProps;
 
 using System.Data;
 
-// *** I use an "alias" for the ado.net classes throughout my code
-// When I switch to an oracle database, I ONLY have to change the actual classes here
 using DBBase = MMABooksTools.BaseSQLDB;
 using DBConnection = MySql.Data.MySqlClient.MySqlConnection;
 using DBCommand = MySql.Data.MySqlClient.MySqlCommand;
